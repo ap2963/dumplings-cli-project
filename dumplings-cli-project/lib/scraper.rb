@@ -35,7 +35,8 @@ class Scraper
                 dumpling.country = Country.all.detect {|c| c.name == country_name}
             else
                 dumpling.country = Country.new(country_name)
-            end 
+            end
+            #adds itself to country's array 
         end
     end
 
