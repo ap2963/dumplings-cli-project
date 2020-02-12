@@ -19,24 +19,23 @@ class Scraper
         end
     end
 
-    def make_country
+    def create_country
         self.get_pair.each do |p|
             country_name = p[1]
-            country = Country.new(country_name) #if it doesn't already exist
+            self.find_or_create_country_by_name(country_name)
         end
     end
         
 
-    def make_dumpling
+    def create_dumpling
         self.get_pair.each do |p|
             dumpling_name = p[0]
             dumpling = Dumpling.new(dumpling_name, country)
-            if Country.all.detect {|c| c.name == country_name} != nil
+            if Dumpling.all.detect {|c| c.name == country_name} != nil
                 dumpling.country = Country.all.detect {|c| c.name == country_name}
             else
                 dumpling.country = Country.new(country_name)
             end
-            #adds itself to country's array 
         end
     end
 
