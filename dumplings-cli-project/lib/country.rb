@@ -13,13 +13,25 @@ class Country
         @@all
     end
 
-    def self.find_or_create_country_by_name(name)
+    def self.find_by_name(name)
         if self.all.detect {|c| c.name == name} == nil
-            country = Country.new(name)
+            country = self.new(name)
             country
         else
-            Country.all.detect {|c| c.name == name}
+            nil
         end
+    end
+
+    def self.create_by_name(name)
+        if self.find_by_name == nil
+            country = Country.new(name)
+        end    
+        country
+    end    
+
+    def self.find_or_create_by_name(name)
+        self.find_by_name
+        self.create_by_name
     end
 
     def region

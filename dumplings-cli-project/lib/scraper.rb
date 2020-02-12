@@ -22,7 +22,7 @@ class Scraper
     def create_country
         self.get_pair.each do |p|
             country_name = p[1]
-            self.find_or_create_country_by_name(country_name)
+            Country.find_or_create_by_name(country_name)
         end
     end
         
@@ -30,12 +30,18 @@ class Scraper
     def create_dumpling
         self.get_pair.each do |p|
             dumpling_name = p[0]
-            dumpling = Dumpling.new(dumpling_name, country)
-            if Dumpling.all.detect {|c| c.name == country_name} != nil
-                dumpling.country = Country.all.detect {|c| c.name == country_name}
-            else
-                dumpling.country = Country.new(country_name)
-            end
+            dumpling = Dumpling.find_or_create_by_name(dumpling_name)           #make module
+            Country.create_country
+            
+
+#set country - should come first anyway but just in case
+
+    def self.find_or_create_by_name(name)
+        if self.all.detect {|d| d.name == name} == nil
+            dumpling = Dumpling.new(name)
+            dumpling
+        else
+            Dumpling.all.detect {|d| d.name == name}
         end
     end
 
