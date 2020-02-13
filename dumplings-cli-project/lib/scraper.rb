@@ -1,5 +1,6 @@
 require 'nokogiri'
 require 'open-uri'
+require 'pry'
 
 class Scraper 
     
@@ -9,7 +10,7 @@ class Scraper
         article
     end
 
-    def get_pair
+    def get_country_dumpling_pair
         pair_array = []
         self.get_article.css("h4").each do |p|
             pair_array << p.to_s[4...-6]
@@ -20,7 +21,7 @@ class Scraper
     end
 
     def create_country
-        self.get_pair.each do |p|
+        self.get_country_dumpling_pair.each do |p|
             country_name = p[1]
             Country.find_or_create_by_name(country_name)
         end
@@ -28,27 +29,17 @@ class Scraper
         
 
     def create_dumpling
-        self.get_pair.each do |p|
+        country = self.create_country
+        self.get_country_dumpling_pair.each do |p|
             dumpling_name = p[0]
-            dumpling = Dumpling.find_or_create_by_name(dumpling_name)           #make module
-            Country.create_country
-            
-
-#set country - should come first anyway but just in case
-
-    def self.find_or_create_by_name(name)
-        if self.all.detect {|d| d.name == name} == nil
-            dumpling = Dumpling.new(name)
-            dumpling
-        else
-            Dumpling.all.detect {|d| d.name == name}
+            dumpling = Dumpling.find_or_create_by_name(dumpling_name, country)           
         end
     end
+            
 
     def get_blurb
 
     end
-end
 
 
-
+    

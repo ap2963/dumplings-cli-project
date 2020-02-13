@@ -1,7 +1,7 @@
-module Findable #extend
+module Findable 
 
     def find_by_name(name)
-        if self.all.detect {|c| c.name == name} == nil
+        if self.all.detect {|a| a.name == name} == nil
             self.all.new(name)
         else
             nil
