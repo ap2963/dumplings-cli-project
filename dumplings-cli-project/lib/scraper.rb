@@ -4,6 +4,8 @@ require 'pry'
 
 class Scraper 
     
+    #Scraper for information about dumplings
+    
     def get_article 
         doc = Nokogiri::HTML(open('https://thecitylane.com/the-best-65-dumplings-around-the-world/'))
         article = doc.css(".vw-post-content")
@@ -27,7 +29,6 @@ class Scraper
         end
     end
         
-
     def create_dumpling
         country = self.create_country
         self.get_country_dumpling_pair.each do |p|
@@ -36,10 +37,23 @@ class Scraper
         end
     end
             
-
     def get_blurb
-
     end
 
+    #Scraper for countries and regions around the world
 
+    def get_table
+        doc = Nokogiri::HTML(open("https://meta.wikimedia.org/wiki/List_of_countries_by_regional_classification"))
+    end
     
+    def rows
+        self.get_table.xpath("//tr")
+    end
+
+    def columns
+        self.rows.map do |c|
+            c.xpath("//td").text
+        end
+    end
+
+   
