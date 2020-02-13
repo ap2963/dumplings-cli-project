@@ -18,13 +18,14 @@ class Country
 
     def region
         #looks in reference hash and instantiates as necessary
-        
+
     end
 
     def dumplings
         @dumplings << Dumpling.all.select{|d| d.country == self}
     end
 
+    #user can ask what region a country belongs to or what countries are in a region
     def reference
         countries_hash = {}
         world_regions = self.all_countries_and_regions.map{ |a| a[1] }.uniq
