@@ -18,13 +18,14 @@ class Country
 
     def region
         #looks in reference hash and instantiates as necessary
+        
     end
 
     def dumplings
         @dumplings << Dumpling.all.select{|d| d.country == self}
     end
 
-    def create_region_keys
+    def reference
         countries_hash = {}
         world_regions = self.all_countries_and_regions.map{ |a| a[1] }.uniq
         world_regions.each{ |r| countries_hash[r.to_sym] = []}

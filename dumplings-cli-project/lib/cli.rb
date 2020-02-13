@@ -4,6 +4,10 @@ class DumplingApplication
     attr_accessor 
 
     def initialize
+        @scraper = Scraper.new
+        @scraper.create_country
+        @scraper.create_dumpling
+        @scraper.
 
     end
 
@@ -19,18 +23,30 @@ class DumplingApplication
             self.call
         end
     end
+
+    #country.region == user selection
+    def list_countries
+        hash = {}
+        Country.all.select{ |c| c.region.name == command #name at end of string that user selected 
+            counter = 1
+            until counter > Country.all.size do
+                hash[counter.to_sym] = 
+                puts "#{counter}. c.capitalize"
+                
+                counter += 1
+            end
+        end
+    end       
     
+    def list_dumplings
+
+    end
+
     def list_regions
 
     end
 
-    def list_countries
 
-    end
-
-    def list_dumplings
-
-    end
 
 
 end
