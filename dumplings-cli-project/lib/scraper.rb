@@ -56,4 +56,24 @@ class Scraper
         end
     end
 
-   
+    def all_countries_and_regions
+        full_array = self.columns.first.split("\n")
+        modified_array = []
+        until full_array.size == 0
+            full_array.pop
+            modified_array << full_array.pop(2)
+        end
+        modified_array
+    end
+
+    def create_region_keys
+        countries_hash = {}
+        world_regions = self.all_countries_and_regions.map{ |a| a[1] }.uniq
+        world_regions.each{ |r| countries_hash[r.to_sym] = []}
+        self.all_countries_and_regions.each do |a| 
+            countries_hash[a[1].to_sym] << a[0]
+        end
+       
+    end
+end
+    
