@@ -1,5 +1,6 @@
 class Country
     attr_accessor :name, :region, :dumplings
+    attr_reader :reference
 
     extend Findable
 
@@ -16,7 +17,7 @@ class Country
     end
 
     def region
-        #looks in Region's hash
+        #looks in reference hash and instantiates as necessary
     end
 
     def dumplings

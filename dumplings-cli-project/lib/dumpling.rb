@@ -20,6 +20,4 @@ class Dumpling
         self.country.region
     end
 
-    #has a region by association
-
 end
