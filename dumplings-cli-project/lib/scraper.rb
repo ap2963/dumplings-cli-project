@@ -12,57 +12,56 @@ class Scraper
         article
     end
 
-    def get_country_dumpling_pair
-        pair_array = []
-        self.get_article.css("h4").each do |p|
-            pair_array << p.to_s[4...-6]
-        end
-        pair_array.map do |p|
-						p.split(" \u2013 ")
-				end
-		end
-	
-	Scraper.new.get_country_dumpling_pair
- 
-    def create_country_and_dumpling_instances
-        self.get_country_dumpling_pair.each do |p|
-						country_name = p[1]
-						dumpling_name = p[0]
-						Country.find_or_create_by_name(country_name)
-						dumpling = Dumpling.find_or_create_by_name(dumpling_name, country)      
-        end
-		end
-		
-
-    def get_blurb
-    end
-
     #Scraper for countries and regions around the world
 
     def get_table
-        doc = Nokogiri::HTML(open("https://meta.wikimedia.org/wiki/List_of_countries_by_regional_classification"))
+      doc = Nokogiri::HTML(open("https://meta.wikimedia.org/wiki/List_of_countries_by_regional_classification"))
     end
     
     def rows
-        self.get_table.xpath("//tr")
-    end
+      self.get_table.xpath("//tr")
+		end
 
     def columns
-        self.rows.map do |c|
-            c.xpath("//td").text
+      self.rows.map do |c|
+        c.xpath("//td").text
         end
     end
 
-    def all_countries_and_regions
-        full_array = self.columns.first.split("\n")
-        modified_array = []
-        until full_array.size == 0
-            full_array.pop
-            modified_array << full_array.pop(2)
-        end
-        modified_array
+	  def get_country_dumpling_pair
+      pair_array = []
+      self.get_article.css("h4").each do |p|
+        pair_array << p.to_s[4...-6]
+			end
+	    pair_array.map do |p|
+				p.split(" \u2013 ")
+			end
+		end
+ 
+    def create_country_and_dumpling_instances
+      self.get_country_dumpling_pair.each do |p| 
+				country_name = p[1]
+				dumpling_name = p[0]
+				country = Country.find_or_create_by_name(country_name)
+				dumpling = Dumpling.find_or_create_by_name(dumpling_name, country)      
+      end
+		end
+
+		def all_countries_and_regions
+      full_array = self.columns.first.split("\n")
+      modified_array = []
+      until full_array.size == 0
+        full_array.pop
+        modified_array << full_array.pop(2)
+      end
+      modified_array
     end
 
+		def create_region_instances
+		end
+		
+		def get_blurb
+    end
 
 end
     
