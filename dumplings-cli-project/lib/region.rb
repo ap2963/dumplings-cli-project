@@ -2,6 +2,7 @@ class Region
     attr_accessor :name, :countries_with_dumplings
     attr_reader :dumplings
 
+		extend Findable
 #instantiates with name 
 #has a hash with country/region relationship?
 #has many dumplings through countries
@@ -10,7 +11,6 @@ class Region
 #keeps track of its own instances
 #is instantiated when country from new region is instantiated
 #country is responsible for looking up relationship??
-
 
     def initialize(name)
         @name = name
@@ -33,5 +33,5 @@ class Region
         @dumplings << Dumpling.all.select{|d| d.country.region == self}
     end
 
-
+end
 

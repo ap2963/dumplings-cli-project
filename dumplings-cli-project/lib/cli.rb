@@ -1,5 +1,3 @@
-require 'pry'
-
 class DumplingApplication
 
     def initialize
@@ -7,7 +5,6 @@ class DumplingApplication
         @scraper.create_country
         @scraper.create_dumpling
         @scraper.create_region
-
     end
 
     def welcome_message
@@ -105,10 +102,6 @@ class DumplingApplication
 
 
 
-Country.all.select{| c | c.region == self} 
-
-
-end
 
 #Go through list of dumplings, instantiating a dumpling first, then a country, then having the country look up its region in the built in reference guide
 

@@ -1,7 +1,6 @@
+
 language = "ruby"
 
 run = 'ruby dumplings-cli-project/lib/scraper.rb'
-
-#scraper = Scraper.new
 
 
