@@ -24,8 +24,8 @@ class DumplingApplication
         puts "What would you like to do?"
         input = gets.chomp
         command = input_to_command(input)
-        if valid_input?(command) == true
-            <display new list/requested info>
+      #  if valid_input?(command) == true
+      #      <display new list/requested info>
             #self.call until command == exit
 
 

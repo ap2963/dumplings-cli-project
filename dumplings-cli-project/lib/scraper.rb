@@ -18,25 +18,22 @@ class Scraper
             pair_array << p.to_s[4...-6]
         end
         pair_array.map do |p|
-            p.split(" \u2013 ")
+						p.split(" \u2013 ")
+				end
+		end
+	
+	Scraper.new.get_country_dumpling_pair
+ 
+    def create_country_and_dumpling_instances
+        self.get_country_dumpling_pair.each do |p|
+						country_name = p[1]
+						dumpling_name = p[0]
+						Country.find_or_create_by_name(country_name)
+						dumpling = Dumpling.find_or_create_by_name(dumpling_name, country)      
         end
-    end
+		end
+		
 
-    def create_country
-        self.get_country_dumpling_pair.each do |p|
-            country_name = p[1]
-            Country.find_or_create_by_name(country_name)
-        end
-    end
-        
-    def create_dumpling
-        country = self.create_country
-        self.get_country_dumpling_pair.each do |p|
-            dumpling_name = p[0]
-            dumpling = Dumpling.find_or_create_by_name(dumpling_name, country)           
-        end
-    end
-            
     def get_blurb
     end
 

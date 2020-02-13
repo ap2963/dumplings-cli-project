@@ -6,7 +6,7 @@ class Dumpling
 
     @@all = []
     
-    def initialize(name, country = nil)
+    def initialize(name, country) #gets from pair_array
         @name  = name
         @country = country
         @@all << self
