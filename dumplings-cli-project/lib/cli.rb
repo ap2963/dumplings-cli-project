@@ -6,19 +6,34 @@ class DumplingApplication
         @scraper = Scraper.new
         @scraper.create_country
         @scraper.create_dumpling
-        @scraper.
+        @scraper.create_region
 
     end
 
-    def call
+    def welcome_message
         puts "Welcome!"
         puts "This application will teach you about different dumplings from around the world."
         puts "Type in the number of a region to get started."
         puts "If you would like to read a brief history about dumplings, type 'history'."
-        puts "To quit, type 'exit'."
+        puts "To quit the application, type 'exit'."
+        puts "To pull up these options again, type '?'"
+    end
+    
+    def call
+        self.welcome_message
         puts "What would you like to do?"
         input = gets.chomp
-        command = input_to_index(input)
+        command = input_to_command(input)
+        if valid_input?(command) == true
+            <display new list/requested info>
+            #self.call until command == exit
+
+
+            if valid_input?(command) == false
+                puts "Sorry, that is not a valid response." 
+                puts "Please type in a number from the list, the word 'history' or the word 'exit'."
+                #displays list again
+            end
 
         until command == "exit"
             self.call
@@ -34,25 +49,39 @@ class DumplingApplication
 
     end
 
-    def input_to_index(input)
+    def input_to_command(input)
         input.to_i - 1
-    end
-
-
-    def valid_input
-        if command >= 0 && command <= some_array.size || input = "history" || input = "exit"
     end
 
     def command(input)
 
     end
+
+#if input is not valid -> puts 
+    def valid_input?(command)
+        if command >= 0 && command <= some_array.size || input = "history" || input = "exit" || input = "?"
+            true
+        else
+            false
+        end
+    end
+
     
-    def display_list
+
+    def regions_list
+        list_of_regions = Country.all.find{|c| }
+    end
+    
+    def display_regions_list
         #need method that looks at reference hash and displays an array of relevant regions
         #puts each item
     end
 
-    def list_countries
+    def display_countries_list
+
+    end
+
+    def countries_list
         countries_hash = {}
         Country.all.select{ |c| c.region.name == command? } #name at end of string that user selected 
             counter = 1
@@ -65,13 +94,15 @@ class DumplingApplication
         end
     end       
     
-    def list_dumplings
-
+    def dumplings_list
+        ###
     end
 
-    def list_regions
-        list_of_regions = Country.all.find{|c| }
+    def display_dumplings_list
+        ###
     end
+
+
 
 
 Country.all.select{| c | c.region == self} 

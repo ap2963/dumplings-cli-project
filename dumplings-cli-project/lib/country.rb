@@ -10,6 +10,7 @@ class Country
         @name  = name
         @dumplings = []
         @@all << self
+        self.region
     end
 
     def self.all
@@ -17,7 +18,8 @@ class Country
     end
 
     def region
-        #looks in reference hash and instantiates as necessary
+        #looks in reference hash and instantiates a new region if necessary
+        #self.region = region_instance
 
     end
 
