@@ -10,16 +10,16 @@ class Scraper
     attr_reader :country_dumpling_pair, :world_regions, :region_country_pair, :reference_hash 
 	
     def initialize
+        @country_dumpling_pair = nil
+        @world_regions = nil
+        @region_country_pair = []
+        @reference_hash = {}
+        
         self.country_dumpling_pair
         self.create_country_and_dumpling_instances()
         self.get_blurb
         self.create_reference_hash
         self.create_region_instances
-
-        @country_dumpling_pair = nil
-        @world_regions = nil
-        @region_country_pair = []
-        @reference_hash = {}
     end
 	
 #scrapes website for information about dumplings
@@ -70,9 +70,11 @@ class Scraper
 #creates an array of arrays that contain a country and its region - [country, region]
     def get_countries_and_regions
         full_array = self.table_columns.first.split("\n")
+        
         until full_array.size == 0
             full_array.pop
             @region_country_pair << full_array.pop(2)
+            counter += 1
         end
         @region_country_pair
     end
