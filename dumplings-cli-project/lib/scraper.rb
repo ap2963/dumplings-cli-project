@@ -5,9 +5,21 @@ require_relative 'region'
 require 'pry'
 
 class Scraper
-	attr_reader :reference_hash 
-    
-    #Scrapes website for information about dumplings
+	attr_reader :country_dumpling_pair, :world_regions, :region_country_pair, :reference_hash 
+  
+  def initialize
+    self.country_dumpling_pair
+    self.create_country_and_dumpling_instances
+    self.create_reference_hash
+    self.create_region_instances
+
+    @country_dumpling_pair = nil
+    @world_regions = nil
+    @region_country_pair = []
+    @reference_hash = {}
+  end
+  
+  #Scrapes website for information about dumplings
     def get_article 
       doc = Nokogiri::HTML(open('https://thecitylane.com/the-best-65-dumplings-around-the-world/'))
       article = doc.css(".vw-post-content")
@@ -34,9 +46,7 @@ class Scraper
       self.get_article.css("h4").each do |p|
         pair_array << p.to_s[4...-6]
 			end
-	    pair_array.map do |p|
-				p.split(" \u2013 ")
-			end
+	    @country_dumpling_pair = pair_array.map{| p | p.split(" \u2013 ")}
 		end
  
     def create_country_and_dumpling_instances
@@ -51,27 +61,25 @@ class Scraper
 		#creates an array of arrays that contain a country and its region - [country, region]
 		def get_countries_and_regions
       full_array = self.table_columns.first.split("\n")
-      modified_array = []
       until full_array.size == 0
         full_array.pop
-        modified_array << full_array.pop(2)
+        @region_country_pair << full_array.pop(2)
       end
-      modified_array
+      @region_country_pair
     end
 
 		def create_reference_hash
-      @reference_hash = {}
-      world_regions = self.get_countries_and_regions.map{ |a| a[1] }.uniq
-      world_regions.each{ |r| reference_hash[r.to_sym] = []}
-			self.get_countries_and_regions.each do |a| 
-				@reference_hash[a[1].to_sym] << a[0]
+      @world_regions = self.get_countries_and_regions.map{| a | a[1] }.uniq
+      @world_regions.each{| r | @reference_hash[r.to_sym] = []}
+			self.get_countries_and_regions.each do | a | 
+				@reference_hash[a[1].to_sym] = a[0]
 			end
 		end
 		
 		def create_region_instances
-			Country.all.uniq.each do |c|
+			Country.all.each do | c |
 				#find region key that has country's name as a string as a value
-				region_name = @reference_hash.key(c.name).to_s
+				region_name = @reference_hash.key(c.name)
 				Region.find_or_create_by_name(region_name)
 			end
 		end

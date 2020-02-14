@@ -20,7 +20,7 @@ class Country
     end
 
     def region
-					#looks in reference hash and instantiates a new region if necessary
+	    				#looks in reference hash and instantiates a new region if necessary
 					#self.region = region_instance
 
     end

@@ -103,16 +103,4 @@ class DumplingApplication
 
 
 
-#Go through list of dumplings, instantiating a dumpling first, then a country, then having the country look up its region in the built in reference guide
 
-#Scrape dumpling website
-#Scrape table
-#Create reference
-#Create dumpling instances (65)
-#Create country instances (?)
-#Look up region in reference
-#Create region instance
-#Display call method
-#Display list of regions
-#Display list of countries in that region
-#Display list of dumplings in that country
