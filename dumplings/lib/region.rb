@@ -12,6 +12,8 @@ class Region
 #is instantiated when country from new region is instantiated
 #country is responsible for looking up relationship??
 
+        @@all = []
+
     def initialize(name)
         @name = name
         @@all << self

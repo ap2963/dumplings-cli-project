@@ -16,7 +16,7 @@ class Scraper
         @reference_hash = {}
         
         self.country_dumpling_pair
-        self.create_country_and_dumpling_instances()
+        self.create_country_and_dumpling_instances
         self.get_blurb
         self.create_reference_hash
         self.create_region_instances
@@ -40,11 +40,11 @@ class Scraper
     
     def create_country_and_dumpling_instances
         self.get_country_dumpling_pair.each do | p | 
-        country_name = p[1]
-        dumpling_name = p[0]
-        country = Country.find_or_create_by_name(country_name)
-        dumpling = Dumpling.find_or_create_by_name(dumpling_name, country)      
-        end
+            country_name = p[1]
+            dumpling_name = p[0]
+            country = Country.find_or_create_by_name(country_name)
+            dumpling = Dumpling.find_or_create_by_name(dumpling_name, country)    
+        end 
     end
   
     def get_blurb
@@ -74,7 +74,6 @@ class Scraper
         until full_array.size == 0
             full_array.pop
             @region_country_pair << full_array.pop(2)
-            counter += 1
         end
         @region_country_pair
     end
@@ -96,6 +95,5 @@ class Scraper
     end
 
 scraper = Scraper.new
-
 binding.pry
 end
