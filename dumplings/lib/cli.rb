@@ -1,7 +1,7 @@
 class DumplingApplication
 
     def initialize
-        @scraper = Scraper.new
+    	@scraper = Scraper.new
         @scraper.create_country
         @scraper.create_dumpling
         @scraper.create_region
