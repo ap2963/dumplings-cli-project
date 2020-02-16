@@ -1,10 +1,18 @@
+require_relative 'country'
+require_relative 'dumpling'
+require_relative 'findable'
+require_relative 'region'
+require 'pry'
+require 'nokogiri'
+require 'open-uri'
+
 class DumplingApplication
 
     def initialize
-    	@scraper = Scraper.new
-        @scraper.create_country
-        @scraper.create_dumpling
-        @scraper.create_region
+    	scraper = Scraper.new
+        scraper.create_country
+        scraper.create_dumpling
+        scraper.create_region
     end
 
     def welcome_message
@@ -19,6 +27,7 @@ class DumplingApplication
     def call
         self.welcome_message
         puts "What would you like to do?"
+        
         input = gets.chomp
         command = input_to_command(input)
       #  if valid_input?(command) == true
@@ -66,12 +75,15 @@ class DumplingApplication
     
 
     def regions_list
-        list_of_regions = Country.all.find{|c| }
+        list_of_regions = Country.all.find{|c| c.region}
     end
     
     def display_regions_list
-        #need method that looks at reference hash and displays an array of relevant regions
-        #puts each item
+        counter = 1
+        self.regions_list.each do |r|
+            puts "#{counter}. r"
+            counter += 1
+        end
     end
 
     def display_countries_list
@@ -85,7 +97,6 @@ class DumplingApplication
             until counter > Country.all.size do
                 countries_hash[counter.to_sym] = 
                 puts "#{counter}. #{c.capitalize}"
-                
                 counter += 1
             end
         end
@@ -99,8 +110,16 @@ class DumplingApplication
         ###
     end
 
+end
 
+cli = DumplingApplication.new
 
+def create_region_instances
+    Country.all.each do | c |
+#find region key that has country's name as a string as a value
+    region_name = @reference_hash.key(c.name)
+    Region.find_or_create_by_name(region_name)
+    end
+end
 
-
-
+end

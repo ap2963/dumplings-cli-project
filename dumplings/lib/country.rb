@@ -1,4 +1,3 @@
-require_relative 'findable'
 
 class Country
     attr_accessor :name, :region, :dumplings
@@ -24,7 +23,7 @@ class Country
     end
  
 
-    def find_or_create_by_name(name)
+    def self.find_or_create_by_name(name)
         if self.all.detect{| r | r.name == name} == nil
             self.new(name)
         else

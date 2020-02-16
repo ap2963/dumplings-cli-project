@@ -21,18 +21,12 @@ class Dumpling
         self.country.region
     end
 
-	def self.find_by_name(name, country)
-        if self.all.detect {|r| r.name == name} == nil
+	def self.find_or_create_by_name(name, country)
+        if self.all.detect {| r | r.name == name} == nil
             self.new(name, country)
         else
             nil
         end
     end
 
-    def self.create_by_name(name, country)
-        if self.all.detect{|r| r.name == name} == nil
-            self.new(name, country)
-        else
-            nil
-        end
-    end
+end

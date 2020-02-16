@@ -2,7 +2,6 @@ class Region
     attr_accessor :name, :countries_with_dumplings
     attr_reader :dumplings
 
-		extend Findable
 #instantiates with name 
 #has a hash with country/region relationship?
 #has many dumplings through countries

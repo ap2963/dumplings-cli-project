@@ -7,19 +7,16 @@ require 'nokogiri'
 require 'open-uri'
 
 class Scraper
-    attr_reader :country_dumpling_pair, :world_regions, :region_country_pair, :reference_hash 
+    attr_reader :country_dumpling_pair, :world_regions, :reference_hash, :region_country_pair
 	
     def initialize
-        @country_dumpling_pair = nil
-        @world_regions = nil
         @region_country_pair = []
-        @reference_hash = {}
         
-        self.country_dumpling_pair
-        self.create_country_and_dumpling_instances
-        self.get_blurb
-        self.create_reference_hash
-        self.create_region_instances
+        #self.get_country_dumpling_pair
+        #self.get_countries_and_regions
+        #self.create_country_and_dumpling_instances
+        #self.create_blurb
+        #self.create_countries_and_regions_hash
     end
 	
 #scrapes website for information about dumplings
@@ -31,30 +28,15 @@ class Scraper
 
     def get_country_dumpling_pair
         pair_array = []
-        self.get_article.css("h4").each do |p|
-        pair_array << p.to_s[4...-6]
+        self.get_article.css("h4").each do | h |
+            pair_array << h.to_s[4...-6]
         end
         @country_dumpling_pair = pair_array.map{| p | p.split(" \u2013 ").flatten}
-        @country_dumpling_pair
     end
     
-    def create_country_and_dumpling_instances
-        self.get_country_dumpling_pair.each do | p | 
-            country_name = p[1]
-            dumpling_name = p[0]
-            country = Country.find_or_create_by_name(country_name)
-            dumpling = Dumpling.find_or_create_by_name(dumpling_name, country)    
-        end 
-    end
-  
-    def get_blurb
-        blurb_array = []
-        blurb_array << self.get_article.css("p").text
-    end
-
 #scrapes wikitable for countries and their regions
     def get_table
-        doc = Nokogiri::HTML(open("https://meta.wikimedia.org/wiki/List_of_countries_by_regional_classification"))
+        doc = Nokogiri::HTML(open("3"))
     end
             
     def table_rows
@@ -70,30 +52,39 @@ class Scraper
 #creates an array of arrays that contain a country and its region - [country, region]
     def get_countries_and_regions
         full_array = self.table_columns.first.split("\n")
-        
         until full_array.size == 0
             full_array.pop
             @region_country_pair << full_array.pop(2)
         end
-        @region_country_pair
     end
 
     def create_reference_hash
-        @world_regions = self.get_countries_and_regions.map{| a | a[1] }.uniq
-        @world_regions.each{| r | @reference_hash[r.to_sym] = []}
-        self.get_countries_and_regions.each do | a | 
-            @reference_hash[a[1].to_sym] = a[0]
-        end
+        self.get_countries_and_regions
+        africa = @region_country_pair.select{| p | p[1] == "Africa"}
+
+        south_america = @region_country_pair.select{| p | p[1] == "South/Latin America"}
+        europe = @region_country_pair.select{| p | p[1] == "Europe"}
+
+        asia = @region_country_pair.select{| p | p[1] == "Asia & Pacific"}
+        
+        middle_east = @region_country_pair.select{| p | p[1] == "Middle east"}
+        north_america = @region_country_pair.select{| p | p[1] == "North America"}
+        arab_states = @region_country_pair.select{| p | p[1] == "Arab States"}
+
+        @reference_hash = {
+            "africa" => africa.map{|p| p[0]},
+            "south_america" => south_america.map{|p| p[0]},
+            "europe" => europe.map{|p| p[0]},
+            "asia" => asia.map{|p| p[0]},
+            "middle_east" => middle_east.map{|p| p[0]},
+            "arab_states" => arab_states.map{|p| p[0]},
+            "north_america" => north_america.map{|p| p[0]}
+        }
     end
-            
-    def create_region_instances
-        Country.all.each do | c |
-#find region key that has country's name as a string as a value
-        region_name = @reference_hash.key(c.name)
-        Region.find_or_create_by_name(region_name)
-        end
-    end
+
+end
+
 
 scraper = Scraper.new
 binding.pry
-end
+
