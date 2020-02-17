@@ -11,7 +11,7 @@ class Scraper
     def initialize
         self.create_reference_hash
         self.create_region_country_dumpling_instances
-        #create.blurb_array
+        self.create_blurb_array
 
     end
 	
@@ -27,8 +27,19 @@ class Scraper
         @country_dumpling_array = pair_array.map{| p | p.split(" \u2013 ").flatten}
     end
 
-    #def create_blurb_array
-    #end
+    def create_blurb_array
+        new_array = []
+        n = self.get_dumplings_article.css("p").each do |node|
+          if node.search("img") != true && node.text != ""
+            new_array << node
+          end
+        end
+        new_array.shift
+        new_array.shift
+        @blurb_array = new_array.map{|n| n.text}
+        self.stragglers.each{|i| @blurb_array.delete_at(i)}
+        @blurb_array
+      end
     
 #scrapes wikitable for countries and their regions
     def get_wikitable
@@ -52,6 +63,11 @@ class Scraper
             full_array.pop
             @region_country_pair << full_array.pop(2)
         end
+    end
+
+    def stragglers
+        stragglers = @country_dumpling_array.select{|a| a.size != 2}
+        stragglers.map{|a| @country_dumpling_array.index(a)}.reverse #19, 60
     end
 
     def get_reference_regions
@@ -110,3 +126,6 @@ class Scraper
     end
 
 end
+
+s = Scraper.new
+binding.pry
