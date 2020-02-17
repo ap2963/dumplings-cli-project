@@ -15,7 +15,9 @@ class Region
 
     def initialize(name)
         @name = name
-        @@all << self
+        unless self.name.class != String
+            @@all << self
+        end
     end
     
     def self.all
@@ -28,6 +30,7 @@ class Region
         else
             self.all.detect{| r | r.name == name}
         end
+    end
     
     def countries_with_dumplings
         Country.all.select{|c| c.region == self}

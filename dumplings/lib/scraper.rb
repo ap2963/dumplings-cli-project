@@ -1,6 +1,5 @@
 require_relative 'country'
 require_relative 'dumpling'
-require_relative 'findable'
 require_relative 'region'
 require 'pry'
 require 'nokogiri'
@@ -11,7 +10,7 @@ class Scraper
 	
     def initialize
         self.create_reference_hash
-        self.create_country_dumpling_array
+        self.create_region_country_dumpling_instances
         #create.blurb_array
 
     end
@@ -24,9 +23,7 @@ class Scraper
 
     def create_country_dumpling_array
         pair_array = []
-        self.get_dumplings_article.css("h4").each do | h |
-            pair_array << h.to_s[4...-6]
-        end
+        self.get_dumplings_article.css("h4").each{| h | pair_array << h.to_s[4...-6]}
         @country_dumpling_array = pair_array.map{| p | p.split(" \u2013 ").flatten}
     end
 
@@ -57,41 +54,62 @@ class Scraper
         end
     end
 
-    def create_reference_regions
+    def get_reference_regions
         self.get_countries_and_regions
         new_array = []
         @region_country_pair.each{| p | new_array << p[1]}
         @regions_array = new_array.delete_if{|x| x == "Unknown"}.uniq
     end
     
-    def create_reference_countries
-      self.get_countries_and_regions
-      @countries_array = []
-      counter = 0
-      @regions_array.size.times do | p |
-        @countries_array[counter] = @region_country_pair.select{|p| p[1] == @regions_array[counter]}.map{| p | p[0]}
-        counter += 1
-      end
+    def get_reference_countries
+        self.get_countries_and_regions
+        @countries_array = []
+        counter = 0
+        @regions_array.size.times do | p |
+            @countries_array[counter] = @region_country_pair.select{|p| p[1] == @regions_array[counter]}.map{| p | p[0]}
+            counter += 1
+        end
     end
     
     def create_reference_hash
-      self.create_reference_regions
-      self.create_reference_countries
-      @reference_hash = Hash[@regions_array.map{|x| [x, @countries_array[@regions_array.find_index(x)]]}]
+        self.get_reference_regions
+        self.get_reference_countries
+        @reference_hash = Hash[@regions_array.map{|x| [x, @countries_array[@regions_array.find_index(x)]]}]
+        @reference_hash 
     end
-    
-    def create_country_and_dumpling_instances
+
+
+    def create_region_country_dumpling_instances
+        self.create_reference_hash
         self.create_country_dumpling_array.each do | p | 
+            
             country_name = p[1]
+            case country_name 
+            when "England" || "Scotland"
+                country_name = "United Kingdom"
+            when "Korea"
+                country_name = "South Korea"
+            when "Dominican Replublic"
+                country_name = "Dominican Republic"
+            when "Russia"
+                country_name = "Russian Federation"
+            when "Palestine"
+                country_name = "Palestinian Territory"
+            else 
+                country_name = p[1]
+            end
+             
             dumpling_name = p[0]
-            region_name = 
+            region_name = @reference_hash.each{|k , v| break k if v.include?(country_name)}
+            
             country = Country.find_or_create_by_name(country_name)
-            dumpling = Dumpling.find_or_create_by_name(dumpling_name, country)    
+            dumpling = Dumpling.find_or_create_by_name(dumpling_name, country)
+            region = Region.find_or_create_by_name(region_name)
+            country.region = region
         end
     end
 
-    def create_region_instances
-        Country.all.each 
-    end
-
 end
+
+s = Scraper.new
+binding.pry

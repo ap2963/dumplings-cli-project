@@ -9,8 +9,9 @@ class Dumpling
     def initialize(name, country) #gets from pair_array
         @name  = name
         @country = country
-        @@all << self
-        self.country.dumplings << self
+        unless self.country.name == nil
+            @@all << self
+        end
     end
 
     def self.all

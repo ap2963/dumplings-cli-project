@@ -1,6 +1,6 @@
 require_relative 'country'
 require_relative 'dumpling'
-require_relative 'findable'
+require_relative 'scraper'
 require_relative 'region'
 require 'pry'
 require 'nokogiri'
@@ -9,20 +9,10 @@ require 'open-uri'
 class DumplingApplication
 
     def initialize
-    	scraper = Scraper.new
-        self.create_country_instances
-        self.create_dumpling_instances
-        self.create_region_instances
+    	scraper = Scraper.new #creates all instances
+        self.call
     end
 
-    def create_country_instances
-        country_dumpling_array
-    end
-    
-    
-    
-    
-    
     def welcome_message
         puts "Welcome!"
         puts "This application will teach you about different dumplings from around the world."
@@ -34,34 +24,23 @@ class DumplingApplication
     
     def call
         self.welcome_message
-        <displays regions>
-
+        self.display_regions_list
         puts "What would you like to do?"
-        
         input = gets.chomp
         command = input_to_command(input)
-      #  if valid_input?(command) == true
-      #      <display new list/requested info>
-            #self.call until command == exit
-
-
-            if valid_input?(command) == false
-                puts "Sorry, that is not a valid response." 
-                puts "Please type in a number from the list, the word 'history' or the word 'exit'."
-                #displays list again
-            end
-
+        if valid_input?(command) == true
+            display_countries_list(command)
+        else valid_input?(command) == false
+            puts "Sorry, that is not a valid response." 
+            puts "Please type in a number from the list, the word 'history' or the word 'exit'."
+        end
         until command == "exit"
             self.call
         end
     end
 
-    #only list countries for which country.region == the region chosen by the user (associated with numbered key hash)
-
+ 
     
-    
-
-
     def input_to_command(input)
         input.to_i - 1
     end
@@ -79,22 +58,22 @@ class DumplingApplication
         end
     end
 
-    
 
-    def regions_list
-        list_of_regions = Country.all.find{|c| c.region}
-    end
     
     def display_regions_list
         counter = 1
-        self.regions_list.each do |r|
-            puts "#{counter}. r"
+        Region.all.each. do |r|
+            puts "#{counter} #{r.name}"
             counter += 1
         end
     end
 
     def display_countries_list
-
+        counter = 1
+        Region.all.each. do |r|
+            puts "#{counter} #{r.name}"
+            counter += 1
+        end
     end
 
     def countries_list
@@ -121,12 +100,3 @@ end
 
 cli = DumplingApplication.new
 
-def create_region_instances
-    Country.all.each do | c |
-#find region key that has country's name as a string as a value
-    region_name = @reference_hash.key(c.name)
-    Region.find_or_create_by_name(region_name)
-    end
-end
-
-end
