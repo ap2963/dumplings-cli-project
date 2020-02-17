@@ -22,13 +22,17 @@ class Region
         @@all
     end
 
+    def self.find_or_create_by_name(name)
+        if self.all.detect{| r | r.name == name} == nil
+            self.new(name)
+        else
+            self.all.detect{| r | r.name == name}
+        end
+    
     def countries_with_dumplings
-
+        Country.all.select{|c| c.region == self}
     end
 
-    def dumplings
-
-    end
 
     def dumplings
         @dumplings << Dumpling.all.select{|d| d.country.region == self}

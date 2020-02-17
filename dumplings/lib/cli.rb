@@ -10,11 +10,19 @@ class DumplingApplication
 
     def initialize
     	scraper = Scraper.new
-        scraper.create_country
-        scraper.create_dumpling
-        scraper.create_region
+        self.create_country_instances
+        self.create_dumpling_instances
+        self.create_region_instances
     end
 
+    def create_country_instances
+        country_dumpling_array
+    end
+    
+    
+    
+    
+    
     def welcome_message
         puts "Welcome!"
         puts "This application will teach you about different dumplings from around the world."
@@ -26,6 +34,8 @@ class DumplingApplication
     
     def call
         self.welcome_message
+        <displays regions>
+
         puts "What would you like to do?"
         
         input = gets.chomp
@@ -50,10 +60,7 @@ class DumplingApplication
 
     
     
-    def inititalize_list_of_countries #based on imput
-        country
 
-    end
 
     def input_to_command(input)
         input.to_i - 1

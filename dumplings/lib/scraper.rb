@@ -7,10 +7,9 @@ require 'nokogiri'
 require 'open-uri'
 
 class Scraper
-    attr_reader 
+    attr_reader :country_dumpling_array, :regions_array, :reference_hash
 	
     def initialize
-        
         self.create_reference_hash
         self.create_country_dumpling_array
         #create.blurb_array
@@ -36,7 +35,7 @@ class Scraper
     
 #scrapes wikitable for countries and their regions
     def get_wikitable
-        doc = Nokogiri::HTML(open("3"))
+        doc = Nokogiri::HTML(open('https://meta.wikimedia.org/wiki/List_of_countries_by_regional_classification'))
     end
             
     def get_table_rows
@@ -50,6 +49,7 @@ class Scraper
     end
 
     def get_countries_and_regions
+        @region_country_pair = []
         full_array = self.get_table_columns.first.split("\n")
         until full_array.size == 0
             full_array.pop
@@ -57,27 +57,41 @@ class Scraper
         end
     end
 
-    def create_reference_hash
+    def create_reference_regions
         self.get_countries_and_regions
-        africa = @region_country_pair.select{| p | p[1] == "Africa"}
-        arab_states = @region_country_pair.select{| p | p[1] == "Arab States"}
-        asia = @region_country_pair.select{| p | p[1] == "Asia & Pacific"}
-        europe = @region_country_pair.select{| p | p[1] == "Europe"}
-        middle_east = @region_country_pair.select{| p | p[1] == "Middle east"}
-        north_america = @region_country_pair.select{| p | p[1] == "North America"}
-        south_america = @region_country_pair.select{| p | p[1] == "South/Latin America"}
+        new_array = []
+        @region_country_pair.each{| p | new_array << p[1]}
+        @regions_array = new_array.delete_if{|x| x == "Unknown"}.uniq
+    end
+    
+    def create_reference_countries
+      self.get_countries_and_regions
+      @countries_array = []
+      counter = 0
+      @regions_array.size.times do | p |
+        @countries_array[counter] = @region_country_pair.select{|p| p[1] == @regions_array[counter]}.map{| p | p[0]}
+        counter += 1
+      end
+    end
+    
+    def create_reference_hash
+      self.create_reference_regions
+      self.create_reference_countries
+      @reference_hash = Hash[@regions_array.map{|x| [x, @countries_array[@regions_array.find_index(x)]]}]
+    end
+    
+    def create_country_and_dumpling_instances
+        self.create_country_dumpling_array.each do | p | 
+            country_name = p[1]
+            dumpling_name = p[0]
+            region_name = 
+            country = Country.find_or_create_by_name(country_name)
+            dumpling = Dumpling.find_or_create_by_name(dumpling_name, country)    
+        end
+    end
 
-        @reference_hash = {
-            "africa" => africa.map{|p| p[0]},
-            "arab_states" => arab_states.map{|p| p[0]},
-            "asia" => asia.map{|p| p[0]},
-            "europe" => europe.map{|p| p[0]},
-            "middle_east" => middle_east.map{|p| p[0]},
-            "north_america" => north_america.map{|p| p[0]},
-            "south_america" => south_america.map{|p| p[0]} 
-        }
+    def create_region_instances
+        Country.all.each 
     end
 
 end
-
-
