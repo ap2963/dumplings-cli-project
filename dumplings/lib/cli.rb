@@ -7,46 +7,103 @@ require 'nokogiri'
 require 'open-uri'
 
 class DumplingApplication
+    attr_reader :country_list, :dumpling_list
 
     def initialize
     	scraper = Scraper.new #creates all instances
+        self.welcome_message
         self.call
     end
 
     def welcome_message
+        puts "\n"
         puts "Welcome!"
         puts "This application will teach you about different dumplings from around the world."
-        puts "Type in the number of a region to get started."
-        puts "If you would like to read a brief history about dumplings, type 'history'."
+        puts "\n"
+    end
+
+    def default_message
+        puts "Type in the number of a region."
         puts "To quit the application, type 'exit'."
-        puts "To pull up these options again, type '?'"
+        puts "\n"
     end
     
     def call
-        self.welcome_message
+        self.default_message
         self.display_regions_list
+        puts "\n"
         puts "What would you like to do?"
+        
         input = gets.chomp
-        command = input_to_command(input)
-        if valid_input?(command) == true
-            display_countries_list(command)
-        else valid_input?(command) == false
+        index = input.to_i - 1
+        
+        if index >= 0 && index <= Region.all.size
+            puts "\n"
+            self.call_two(index)
+        elsif input == 'exit'
+            exit
+        else
+            puts "\n"
             puts "Sorry, that is not a valid response." 
-            puts "Please type in a number from the list, the word 'history' or the word 'exit'."
-        end
-        until command == "exit"
             self.call
+            puts "\n"
         end
     end
 
- 
-    
-    def input_to_command(input)
-        input.to_i - 1
+    def call_two(index)
+        @country_list = Country.all.select{|c| c.region == Region.all[index]}
+        self.display_countries_list(index)
+        
+        puts "\n"
+        puts "Type in the number of a country."
+
+        input = gets.chomp
+        index = input.to_i - 1
+        puts "\n"
+        
+        if index >= 0 && index <= @country_list.size 
+            puts "\n"
+            self.call_three(index)
+        elsif input == 'exit'
+            exit
+        else
+            puts "\n"
+            puts "Sorry, that is not a valid response." 
+            self.call_two
+            puts "\n"
+        end
     end
 
-    def command(input)
+    def display_countries_list(index)
+        @country_list.each_with_index{|c, i| puts "#{i+1} #{c.name}"}
+    end
 
+    
+    def call_three(index)
+        @dumpling_list = Dumpling.all.select{|d| d.country == @country_list[index]}
+        self.display_dumplings_list(index)
+        
+        puts "\n"
+        puts "Type in the number of a dumpling."
+
+        input = gets.chomp
+        index = input.to_i - 1
+        puts "\n"
+
+        if index >= 0 && index <= @dumpling_list.size
+            exit
+        elsif input == 'exit'
+            exit
+        else
+            puts "\n"
+            puts "Sorry, that is not a valid response." 
+            self.call_three
+            puts "\n"
+        end
+    end
+    
+    def display_dumplings_list(index)
+        @dumpling_list.each_with_index{|d, i| puts "#{i+1} #{d.name}"}
     end
 
 #if input is not valid -> puts 
@@ -61,40 +118,12 @@ class DumplingApplication
 
     
     def display_regions_list
-        counter = 1
-        Region.all.each. do |r|
-            puts "#{counter} #{r.name}"
-            counter += 1
-        end
+        Region.all.each_with_index{|r, i| puts "#{i+1} #{r.name}"}
     end
 
-    def display_countries_list
-        counter = 1
-        Region.all.each. do |r|
-            puts "#{counter} #{r.name}"
-            counter += 1
-        end
-    end
 
-    def countries_list
-        countries_hash = {}
-        Country.all.select{ |c| c.region.name == command? } #name at end of string that user selected 
-            counter = 1
-            until counter > Country.all.size do
-                countries_hash[counter.to_sym] = 
-                puts "#{counter}. #{c.capitalize}"
-                counter += 1
-            end
-        end
-    end       
-    
-    def dumplings_list
-        ###
-    end
 
-    def display_dumplings_list
-        ###
-    end
+
 
 end
 

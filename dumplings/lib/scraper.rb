@@ -110,6 +110,3 @@ class Scraper
     end
 
 end
-
-s = Scraper.new
-binding.pry
