@@ -1,7 +1,7 @@
 
 class Country
-    attr_accessor :region
-    attr_reader :name, :dumplings
+    attr_accessor :region #from wikitable scraper
+    attr_reader :name, :dumplings #from other scraper
 
     @@all = []
         
@@ -24,8 +24,9 @@ class Country
         end
     end    
 
-    def dumplings
-        Dumpling.all.select{|d| d.country == self}
-    end
+   # def dumplings
+   #     Dumpling.all.select{|d| d.country == self}
+   # end
+
 
 end

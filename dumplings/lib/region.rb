@@ -2,16 +2,7 @@ class Region
     attr_accessor :name, :countries_with_dumplings
     attr_reader :dumplings
 
-#instantiates with name 
-#has a hash with country/region relationship?
-#has many dumplings through countries
-#has several countries with dumplings
-#keeps track of its countries that have been instantiated
-#keeps track of its own instances
-#is instantiated when country from new region is instantiated
-#country is responsible for looking up relationship??
-
-        @@all = []
+    @@all = []
 
     def initialize(name)
         @name = name
@@ -25,17 +16,16 @@ class Region
     end
 
     def self.find_or_create_by_name(name)
-        if self.all.detect{| r | r.name == name} == nil
+        if self.all.detect{| region_instance | region_instance.name == name} == nil
             self.new(name)
         else
-            self.all.detect{| r | r.name == name}
+            self.all.detect{| region_instance | region_instance.name == name}
         end
     end
     
     def countries_with_dumplings
-        Country.all.select{|c| c.region == self}
+        Country.all.select{| country_instance | country_instance.region == self}
     end
-
 
     def dumplings
         @dumplings << Dumpling.all.select{|d| d.country.region == self}

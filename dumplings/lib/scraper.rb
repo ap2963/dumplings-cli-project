@@ -1,99 +1,53 @@
 require_relative 'country'
 require_relative 'dumpling'
 require_relative 'region'
-require 'pry'
 require 'nokogiri'
 require 'open-uri'
+require 'pry'
 
 class Scraper
-    attr_reader :country_dumpling_array, :regions_array, :reference_hash
-	
-    def initialize
-        self.create_reference_hash
-        self.create_region_country_dumpling_instances
-        self.create_blurb_array
-
-    end
-	
-    def get_dumplings_article 
-        doc = Nokogiri::HTML(open('https://thecitylane.com/the-best-65-dumplings-around-the-world/'))
-        article = doc.css(".vw-post-content")
-        article
-    end
-
-    def create_country_dumpling_array
-        pair_array = []
-        self.get_dumplings_article.css("h4").each{| h | pair_array << h.to_s[4...-6]}
-        @country_dumpling_array = pair_array.map{| p | p.split(" \u2013 ").flatten}
-    end
-
-    def create_blurb_array
-        new_array = []
-        n = self.get_dumplings_article.css("p").each do |node|
-          if node.search("img") != true && node.text != ""
-            new_array << node
-          end
-        end
-        new_array.shift
-        new_array.shift
-        @blurb_array = new_array.map{|n| n.text}
-        self.stragglers.each{|i| @blurb_array.delete_at(i)}
-        @blurb_array
-      end
+    attr_accessor :blurb_array, :dumpling_hash, :country_region_hash
     
-#scrapes wikitable for countries and their regions
-    def get_wikitable
-        doc = Nokogiri::HTML(open('https://meta.wikimedia.org/wiki/List_of_countries_by_regional_classification'))
-    end
-            
-    def get_table_rows
-        self.get_wikitable.xpath("//tr")
-    end
+    def self.article_scraper 
+        article = Nokogiri::HTML(open('https://thecitylane.com/the-best-65-dumplings-around-the-world/'))
+        blurb_array = []
+        article.css('p').each do | blurb |
+            if blurb.search('img') != true && blurb.text != ""
+                blurb_array << blurb.text
+            end
+        end
 
-    def get_table_columns
-        self.get_table_rows.map do |c|
-            c.xpath("//td").text
+        counter = 2
+        article.css('h4').collect do | dumpling_attributes |
+            dumpling_hash = {
+                :dumpling_name => dumpling_attributes.text.split(" \u2013 ")[0],
+                :country_name => dumpling_attributes.text.split(" \u2013 ")[1],
+                :blurb => blurb_array[counter]
+                }
+            counter += 1
+            dumpling_hash
+        end
+    end
+    
+    
+    def self.wiki_table_scraper
+        wiki_table = Nokogiri::HTML(open('https://meta.wikimedia.org/wiki/List_of_countries_by_regional_classification'))
+        wiki_table.css('tbody').css('tr').collect do | row |
+            country_region_hash = {
+                :country => row.css('td')[0],
+                :region => row.css('td')[1]
+            }
+            country_region_hash
         end
     end
 
-    def get_countries_and_regions
-        @region_country_pair = []
-        full_array = self.get_table_columns.first.split("\n")
-        until full_array.size == 0
-            full_array.pop
-            @region_country_pair << full_array.pop(2)
-        end
-    end
 
     def stragglers
         stragglers = @country_dumpling_array.select{|a| a.size != 2}
         stragglers.map{|a| @country_dumpling_array.index(a)}.reverse #19, 60
     end
 
-    def get_reference_regions
-        self.get_countries_and_regions
-        new_array = []
-        @region_country_pair.each{| p | new_array << p[1]}
-        @regions_array = new_array.delete_if{|x| x == "Unknown"}.uniq
-    end
-    
-    def get_reference_countries
-        self.get_countries_and_regions
-        @countries_array = []
-        counter = 0
-        @regions_array.size.times do | p |
-            @countries_array[counter] = @region_country_pair.select{|p| p[1] == @regions_array[counter]}.map{| p | p[0]}
-            counter += 1
-        end
-    end
-    
-    def create_reference_hash
-        self.get_reference_regions
-        self.get_reference_countries
-        @reference_hash = Hash[@regions_array.map{|x| [x, @countries_array[@regions_array.find_index(x)]]}]
-        @reference_hash 
-    end
-
+  
 
     def create_region_country_dumpling_instances
         self.create_reference_hash
@@ -126,6 +80,3 @@ class Scraper
     end
 
 end
-
-s = Scraper.new
-binding.pry
