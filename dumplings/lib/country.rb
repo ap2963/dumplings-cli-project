@@ -1,15 +1,13 @@
-
 class Country
-    attr_accessor :region #from wikitable scraper
-    attr_reader :name, :dumplings #from other scraper
+    attr_accessor 
+    attr_reader :name, :dumplings, :region
 
     @@all = []
         
     def initialize(name)
         @name = name
-        unless self.name == nil
-            @@all << self
-        end
+
+        @@all << self
     end
 
     def self.all
@@ -17,16 +15,20 @@ class Country
     end
 
     def self.find_or_create_by_name(name)
-        if self.all.detect{| r | r.name == name} == nil
+        if self.all.detect{| country_instance | country_instance.name == name} == nil
             self.new(name)
         else
-            self.all.detect{| r | r.name == name}
+            self.all.detect{| country_instance | country_instance.name == name}
         end
     end    
 
-   # def dumplings
-   #     Dumpling.all.select{|d| d.country == self}
-   # end
+    def dumplings
+        Dumpling.all.select{| dumpling_instance | dumpling_instance.country == self}
+    end
 
 
+    def region
+        region_name = Scraper.wikitable_scraper.select{| hash | hash[:country_name] == self.name}[:region]
+        Region.all.select{| region_instance | region_instance.name == region_name}
+    end
 end

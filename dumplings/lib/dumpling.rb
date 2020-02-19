@@ -1,18 +1,14 @@
-require_relative 'country'
-
 class Dumpling
-    attr_accessor :name, :country
-    #attr_reader :region
+    attr_accessor :name, :country, :blurb
+    attr_reader :region 
 
     @@all = []
     
-    def initialize(name, country, region, blurb) 
+    def initialize(name, country) 
         @name  = name
-        @country = country
-        
-        unless self.country.name == nil
-            @@all << self
-        end
+        self.country = country
+        self.blurb = Scraper.new.article_scraper.select{| hash | hash[:dumpling_name] == self.name}
+        @@all << self
     end
 
     def self.all
@@ -20,11 +16,15 @@ class Dumpling
     end
 
 	def self.find_or_create_by_name(name, country)
-        if self.all.detect {| dumpling_instance | dumpling_instance.name == name} == nil
+        if self.all.detect{| dumpling_instance | dumpling_instance.name == name} == nil
             self.new(name, country)
         else
-            nil
+            self.all.detect{| dumpling_instance | dumpling_instance.name == name}
         end
+    end
+
+    def region
+        self.country.region
     end
 
 end

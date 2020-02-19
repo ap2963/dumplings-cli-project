@@ -1,14 +1,12 @@
 class Region
-    attr_accessor :name, :countries_with_dumplings
-    attr_reader :dumplings
+    attr_accessor :name
+    attr_reader :countries_with_dumplings, :dumplings
 
     @@all = []
 
     def initialize(name)
         @name = name
-        unless self.name.class != String
-            @@all << self
-        end
+        @@all << self
     end
     
     def self.all
@@ -28,7 +26,7 @@ class Region
     end
 
     def dumplings
-        @dumplings << Dumpling.all.select{|d| d.country.region == self}
+        Dumpling.all.select{| dumpling_instance | dumpling_instance.country.region == self}
     end
 
 end
