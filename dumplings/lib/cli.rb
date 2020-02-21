@@ -6,6 +6,7 @@ class DumplingApplication
     def start
         welcome_message
         attributes = Scraper.new.scraped_attributes
+        @history = Scraper.new.history_scraper
         create_objects(attributes)
         instructions_message
         input = nil
@@ -81,7 +82,7 @@ class DumplingApplication
         input_to_index
         until ['exit', 'history', 'help'].include?(@input) == true || (@index >= 0 && @index < Region.all.size) == true do
             puts "That is not a valid input."
-            get_input
+            get_input_one
         end
         if @index >= 0 && @index < Region.all.size 
             @region = Region.all[@index]
@@ -166,7 +167,10 @@ class DumplingApplication
             puts "Goodbye!"
             exit        
         elsif @input == 'history'
-
+            @history.each do | paragraph | 
+                puts paragraph 
+                puts "\n"
+            end
         elsif @input == 'help'
             "/n"
             help_screen
@@ -259,4 +263,12 @@ def back_all
     else 
         call_one
     end
+end
+
+def history
+    @history.each do | paragraph | 
+        puts paragraph 
+        puts "\n"
+    end
+    help_back
 end

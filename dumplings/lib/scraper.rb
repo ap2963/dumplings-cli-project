@@ -53,4 +53,11 @@ class Scraper
         end
     end
 
+    def history_scraper
+        history = Nokogiri::HTML(open('https://www.history.com/news/delightful-delicious-dumplings'))
+        history.css("div.l-grid--content-body").css('p').map do | p |
+            paragraphs = p.text
+        end
+    end
+
 end
