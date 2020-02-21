@@ -1,0 +1,141 @@
+require 'colorize'
+require 'colorized_string'
+
+class DumplingApplication
+    attr_accessor 
+
+    def initialize
+    end
+
+    def start
+        welcome_message
+        attributes = Scraper.new.scraped_attributes
+        create_objects(attributes)
+        instructions_message
+        input = nil
+        call_one
+    end
+
+
+    def welcome_message
+        puts "\n"
+        puts "Welcome!"
+        puts "This application will teach you about different dumplings from around the world."
+        puts "One moment while the content loads."
+        puts "\n"
+    end
+
+    def create_objects(attributes)
+        Region.create_region_instances(attributes)
+        Country.create_country_instances(attributes)
+        Dumpling.create_dumpling_instances(attributes)
+    end
+    
+    def instructions_message
+        puts "To navigate, enter the number next to a region, country, or dumpling." 
+        puts "To read a short history about dumplings, enter 'history'."
+        puts "To view a full list of your options, enter 'help'."
+    end
+    
+    def default_settings
+        @steps = []
+    end
+
+    def default_message
+        puts "\n"
+        puts "What would you like to do?".black.on_light_white
+    end
+
+
+    def call_one
+        @steps = []
+        display_regions_list
+        default_message
+        input = gets.chomp
+        get_index
+
+        if @index == -1
+            general_options
+        else 
+            if index >= 0 && index < Region.all.size        
+                @region = Region.all[@index]
+                @steps << @region
+                puts "\n"
+                self.display_countries_list
+                self.call_two
+            end
+        end
+    end
+        
+        elsif input == 'exit'
+            exit
+
+    def call_two
+        input = gets.chomp
+        get_index
+        
+        if @country.dumplings.size == 1
+            @country = @region.countries_with_dumplings[@index]
+            @index = 0
+            @steps << @country
+            @dumpling = @country.dumplings[@index]
+            @steps << @dumpling
+            self.display_blurb  
+        elsif index >= 0 && index < @region.countries_with_dumplings.size 
+            @country = @region.countries_with_dumplings[@index]
+            @steps << @country
+            puts "\n"
+            self.display_dumplings_list
+            self.call_three
+        end
+
+   
+    def get_index
+        @index = input.to_i - 1
+    end
+
+
+    def call_three
+        input = gets.chomp
+        get_index           
+
+        if index >= 0 && index <= @country.dumplings.size
+            @dumpling = @country.dumplings[@index]
+            @steps << @dumpling
+            self.display_blurb
+        elsif input == 'exit'
+            exit
+        else
+            puts "\n"
+            puts "Sorry, that is not a valid input." 
+            self.call_three
+            puts "\n"
+        end
+    end
+        
+    def display_regions_list
+        Region.all.each_with_index{| region_instance, index | puts "#{index + 1}  #{region_instance.name}"}         
+    end
+
+    def display_countries_list
+        @region.countries_with_dumplings.each_with_index{| country_instance, index | puts "#{index + 1}  #{country_instance.name}"}       #=> list of countries
+    end
+
+    def display_dumplings_list  
+        @country.dumplings.each_with_index{| dumpling_instance, index | puts "#{index + 1}  #{dumpling_instance.name}"}
+    end
+
+    def display_blurb   
+        puts "\n"
+        puts @dumpling.name
+        puts "\n"
+        puts @dumpling.blurb
+        @steps << @dumpling.blurb
+        puts "\n"
+        puts "\n"
+
+    end
+end
+
+
+

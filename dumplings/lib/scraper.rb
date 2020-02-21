@@ -1,23 +1,23 @@
 class Scraper
 
+    def article
+        Nokogiri::HTML(open('https://thecitylane.com/the-best-65-dumplings-around-the-world/'))
+    end
+
     def article_scraper
         @info ||= article.css('h4')[0..-3].map do | heading |
-            data = {dumpling: heading.text.split(/ [^\w\s]+ ?/)[0],
-                    country: heading.text.split(/ [^\w\s]+ ?/)[1]
+            data = {dumpling_name: heading.text.split(/ [^\w\s]+ ?/)[0],
+                    country_name: heading.text.split(/ [^\w\s]+ ?/)[1]
                     }
             next_el = heading.next_element
             while next_el && next_el.name != "h4"
-              if next_el.search('img') != true && next_el.text != ""
-                data[:blurb] = next_el.text
-              end
-              next_el = next_el.next_element
+                if next_el.search('img') != true && next_el.text != ""
+                    data[:blurb] = next_el.text
+                end
+                next_el = next_el.next_element
             end
             data
         end
-    end
-
-    def article
-        Nokogiri::HTML(open('https://thecitylane.com/the-best-65-dumplings-around-the-world/'))
     end
 
     def wikitable_scraper
@@ -32,30 +32,24 @@ class Scraper
         @regions
     end
 
-    
     def scraped_attributes
-        #start = Time.now
-        #puts "#{(Time.now - start)}"
-        article_scraper.map do | c_hash |
-           
-            case c_hash[:country]
+        article_scraper.map do | attributes_hash |
+            case attributes_hash[:country_name]
             when "England", "Scotland"
-                c_hash[:country] = "United Kingdom"
+                attributes_hash[:country_name] = "United Kingdom"
             when "Korea"
-                c_hash[:country] = "South Korea"
+                attributes_hash[:country_name] = "South Korea"
             when "Dominican Replublic"
-                c_hash[:country] = "Dominican Republic"
+                attributes_hash[:country_name] = "Dominican Republic"
             when "Russia"
-                c_hash[:country] = "Russian Federation"
+                attributes_hash[:country_name] = "Russian Federation"
             when "Palestine"
-                c_hash[:country] = "Palestinian Territory"
+                attributes_hash[:country_name] = "Palestinian Territory"
             else
             end
-            country = c_hash[:country]
-            c_hash[:region_name] = wikitable_scraper[country]
-
-            c_hash
-
+            country_name = attributes_hash[:country_name]
+            attributes_hash[:region_name] = wikitable_scraper[country_name]
+            attributes_hash
         end
     end
 
