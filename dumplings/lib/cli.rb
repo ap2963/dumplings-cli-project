@@ -1,5 +1,4 @@
-require 'colorize'
-require 'colorized_string'
+require 'tty-prompt'
 
 class DumplingApplication
 
@@ -15,12 +14,32 @@ class DumplingApplication
 
     def welcome_message
         puts "\n"
-        puts "Welcome!"
-        puts "This application will teach you about different dumplings from around the world."
-        puts "One moment while the content loads."
+        puts "\n"
+        banner
+        puts "WELCOME!".colorize(:yellow).blink
+        puts "\n"
+        puts "Learn about 65 types of dumplings from around the world."
+        puts "\n"
+        puts "One moment while the content loads..."
         puts "\n"
     end
 
+    def banner
+        puts "     ___                              ___                               "
+        puts "    (   )                            (   ).-.                           "
+        puts "  .-.| |___  ___ ___ .-. .-.    .-..  | |( __)___ .-.   .--.     .--.   "
+        puts " /   \ (   )(   |   )   '   \  /    \ | |(''\"|   )   \ /    \  /  _  \ "
+        puts "|  .-. || |  | | |  .-.  .-. ;' .-,  ;| | | | |  .-. .;  ,-. '. .' `. ; "
+        puts "| |  | || |  | | | |  | |  | || |  . || | | | | |  | || |  | || '   | | " 
+        puts "| |  | || |  | | | |  | |  | || |  | || | | | | |  | || |  | |_\_`.(___)"
+        puts "| |  | || |  | | | |  | |  | || |  | || | | | | |  | || |  | (   ). '.  "
+        puts "| '  | || |  ; ' | |  | |  | || |  ' || | | | | |  | || '  | || |  `\ | "
+        puts "' `-'  /' `-'  / | |  | |  | || `-'  '| | | | | |  | |'  `-' |; '._,' ' "
+        puts " `.__,'  '.__.' (___)(___)(___) \__.'(___|___|___)(___)`.__. | '.___.'  "
+        puts "                              | |                      ( `-' ;          "
+        puts "                             (___)                      `.__.           "
+    end
+    
     def create_objects(attributes)
         Region.create_region_instances(attributes)
         Country.create_country_instances(attributes)
@@ -28,50 +47,44 @@ class DumplingApplication
     end
     
     def instructions_message
-        puts "To navigate, enter the number next to a region, country, or dumpling." 
-        puts "To read a short history about dumplings, enter 'history'."
-        puts "To view a full list of your options, enter 'help'."
-        puts "\n"
+        puts ">> ".colorize(:yellow) + "Enter a number".colorize(:cyan) + " to navigate to the region, country, or dumpling." 
+        puts ">> ".colorize(:yellow) + "To read about the history of dumplings," + " enter 'history'".colorize(:cyan) + "."
+        puts ">> ".colorize(:yellow) + "For more options," + " enter 'help'".colorize(:cyan) + "."
     end
-    
+
     def default_message
-        puts "What would you like to do?".black.on_light_white
         puts "\n"
+        puts "What would you like to do?".colorize(:yellow)
     end
 
     def input_to_index
         @index = @input.to_i - 1
     end
 
-    def help_loop
+    def h_loop
         @input = gets.chomp
-        until @input == 'done' do
+        until @input == 'done' || @input == 'exit' do
             puts "\n"
-            puts "Sorry, that is not a valid input."
-            puts "\n"
-            self.help_loop
+            puts "Sorry, that is not a valid input. Please try again.".colorize(:yellow) 
+            self.h_loop
         end
         if @input == 'done'
-            help_back
+            h_back
+        elsif @input == 'exit'
+            exit
         end
     end
 
     def help_screen
-        puts "{number}    Navigate to region, country, or dumpling" 
-        puts "back        Go back one step"
-        puts "back!       Go back to first step"
         puts "\n"
-        puts "history     Read short history about dumplings"
+        print TTY::Box.frame "back        Go back one step", "back!       Go back to first step", "exit        Quit application", "help        View options", "history     Read about the history of dumplings", "<list #>    Navigate to region, country, or dumpling"
         puts "\n"
-        puts "help        View options"
-        puts "exit        Quit application"
-        puts "\n"  
-        puts "Enter 'done' to return"
+        puts "Enter 'done' to return.".colorize(:yellow) 
     end
     
-
     def call_one
         @steps = []
+        puts "\n"
         display_regions_list
         default_message
         get_input_one
@@ -80,20 +93,21 @@ class DumplingApplication
     def get_input_one
         @input = gets.chomp
         input_to_index
-        until ['exit', 'history', 'help'].include?(@input) == true || (@index >= 0 && @index < Region.all.size) == true do
-            puts "That is not a valid input."
+        until ['exit', 'back', 'back!', 'history', 'help'].include?(@input) == true || (@index >= 0 && @index < Region.all.size) == true do
+            puts "Sorry, that is not a valid input. Please try again.".colorize(:yellow)
+            puts "\n"
             get_input_one
         end
         if @index >= 0 && @index < Region.all.size 
             @region = Region.all[@index]
             @steps << @region
-            puts "\n"
             self.call_two
         end
         valid_input_one
     end
 
     def call_two
+        puts "\n"
         display_countries_list
         default_message
         get_input_two
@@ -103,7 +117,8 @@ class DumplingApplication
         @input = gets.chomp
         input_to_index
         until ['exit', 'back', 'back!', 'history', 'help'].include?(@input) == true || (@region.countries_with_dumplings[@index].dumplings.size == 1 && @index != -1) || (@region.countries_with_dumplings[@index].dumplings.size != 1 && @index >= 0 && @index < @region.countries_with_dumplings.size) == true do
-            puts "That is not a valid input."
+            puts "Sorry, that is not a valid input. Please try again.".colorize(:yellow) 
+            puts "\n"
             get_input_two
         end
         if @region.countries_with_dumplings[@index].dumplings.size == 1 && @index != -1
@@ -111,18 +126,17 @@ class DumplingApplication
             @steps << @country
             @dumpling = @country.dumplings[0]
             @steps << @dumpling
-            self.display_blurb
             self.call_four
         elsif @region.countries_with_dumplings[@index].dumplings.size != 1 && @index >= 0 && @index < @region.countries_with_dumplings.size 
             @country = @region.countries_with_dumplings[@index]
             @steps << @country
-            puts "\n"
             self.call_three
         end
         valid_input
     end
 
     def call_three
+        puts "\n"
         display_dumplings_list
         default_message
         get_input_three
@@ -132,19 +146,21 @@ class DumplingApplication
         @input = gets.chomp
         input_to_index
         until ['exit', 'back', 'back!', 'history', 'help'].include?(@input) == true || (@index >= 0 && @index < @country.dumplings.size) == true do
-            puts "That is not a valid input."
+            puts "Sorry, that is not a valid input. Please try again.".colorize(:yellow)
+            puts "\n" 
             get_input_three
         end
         if @index >= 0 && @index < @country.dumplings.size
             @dumpling = @country.dumplings[@index]
             @steps << @dumpling
-            self.display_blurb
             self.call_four
         end
         valid_input
     end
 
     def call_four
+        puts "\n"
+        display_blurb
         default_message
         get_input_four
     end
@@ -154,8 +170,8 @@ class DumplingApplication
         @input = gets.chomp
         input_to_index
         until ['exit', 'back', 'back!', 'history', 'help'].include?(@input) == true do
-            puts "That is not a valid input."
-            "/n"
+            puts "Sorry, that is not a valid input. Please try again.".colorize(:yellow) 
+            "\n"
             get_input_four
         end
         valid_input
@@ -166,36 +182,46 @@ class DumplingApplication
             puts "Thank you for using Dumplings."
             puts "Goodbye!"
             exit        
+        elsif @input == 'back'
+            puts "You are on the first page. Please try again.".colorize(:yellow) 
+            puts "\n"
+            get_input_one
+        elsif @input == 'back!'
+            puts "You are on the first page. Please try again.".colorize(:yellow) 
+            puts "\n"
+            get_input_one
         elsif @input == 'history'
-            @history.each do | paragraph | 
-                puts paragraph 
-                puts "\n"
-            end
+            history
+            "\n"
         elsif @input == 'help'
-            "/n"
+            "\n"
             help_screen
-            help_loop
-            "/n"        
+            h_loop
+            "\n"        
         end     
     end
 
     def valid_input    
         if @input == 'exit'
-            puts "Thank you for using Dumplings."
-            puts "Goodbye!"
+            puts "\n"
+            puts "Thank you for using Dumplings.".colorize(:cyan)
+            puts "Goodbye!".colorize(:cyan)
+            puts "\n"
             exit        
         elsif @input == 'back'
             back
-            "/n"
+            "\n"
         elsif @input == 'back!'
             back_all
-            "/n"
+            "\n"
         elsif @input == 'history'
-
+            history
+            h_loop
+            "\n"
         elsif @input == 'help'
             help_screen
-            help_loop
-            "/n"
+            h_loop
+            "\n"
         end    
     end
 
@@ -213,62 +239,58 @@ class DumplingApplication
     end
 
     def display_blurb   
+        puts @dumpling.name.colorize(:cyan)
         puts "\n"
-        puts @dumpling.name
-        puts "\n"
-        puts @dumpling.blurb
+        puts @dumpling.blurb.colorize(:cyan)
         @steps << @dumpling.blurb
-        puts "\n"
-        puts "\n"
     end
 
-end
+    def h_back
+        if @steps.size == 4
+            call_four #countries
+        elsif @steps.size == 3
+            call_four #countries
+        elsif @steps.size == 2
+            call_three #regions
+        elsif @steps.size == 1
+            call_two
+        elsif @steps.size == 0
+            call_one
+        end 
+    end
 
-def help_back
-    if @steps.size == 4
-        call_four #countries
-    elsif @steps.size == 3
-        call_three #countries
-    elsif @steps.size == 2
-        call_two #regions
-    elsif @steps.size == 1
-        call_one
-    end 
-end
+    def back
+        if @steps.size == 4 && @steps[1].dumplings.size == 1
+            @steps.pop
+            @steps.pop
+            call_two #countries
+        elsif @steps.size == 4 && @steps[1].dumplings.size != 1
+            @steps.pop
+            call_three #dumplings
+        elsif @steps.size == 3
+            @steps.pop
+            call_three #countries
+        elsif @steps.size == 2
+            @steps.pop
+            call_two #regions
+        elsif @steps.size == 1
+            @steps.pop
+            call_one #regions
+        end 
+    end
 
-def back
-    if @steps.size == 4 && @steps[1].dumplings.size == 1
-        @steps.pop
-        @steps.pop
-        call_two #countries
-    elsif @steps.size == 4 && @steps[1].dumplings.size != 1
-        @steps.pop
-        call_three #dumplings
-    elsif @steps.size == 3
-        @steps.pop
-        call_two #countries
-    elsif @steps.size == 2
-        @steps.pop
-        call_one #regions
-    else 
-        puts "You are on the first page."
-        puts "\n"
-    end 
-end
-
-def back_all
-    if @steps.size == 1
-        puts "You are on the first page."
-        puts "\n"
-    else 
+    def back_all
         call_one
     end
+
+    def history
+        puts "\n"
+        @history.each do | paragraph | 
+            puts paragraph
+            puts "\n" 
+        end
+        puts "Enter 'done' to return.".colorize(:yellow)
+        h_loop
+    end
 end
 
-def history
-    @history.each do | paragraph | 
-        puts paragraph 
-        puts "\n"
-    end
-    help_back
-end
