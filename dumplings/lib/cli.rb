@@ -1,5 +1,3 @@
-require 'tty-prompt'
-
 class DumplingApplication
 
     def start
@@ -18,7 +16,7 @@ class DumplingApplication
         banner
         puts "WELCOME!".colorize(:yellow).blink
         puts "\n"
-        puts "Learn about 65 types of dumplings from around the world."
+        puts "Learn about 65 types of dumplings, filled pockets, and little pies from around the world."
         puts "\n"
         puts "One moment while the content loads..."
         puts "\n"
@@ -61,25 +59,101 @@ class DumplingApplication
         @index = @input.to_i - 1
     end
 
-    def h_loop
+    def valid_input    
+        if @input == 'exit'
+            puts "\n"
+            puts "Thank you for using Dumplings.".colorize(:cyan)
+            puts "Goodbye!".colorize(:cyan)
+            puts "\n"
+            exit        
+        elsif @input == 'back'
+            back_step
+            "\n"
+        elsif @input == 'back!'
+            back_to_first_screen
+            "\n"
+        elsif @input == 'history'
+            history_screen
+            "\n"
+        elsif @input == 'help'
+            help_screen
+            "\n"
+        end    
+    end
+
+    def back_step
+        if @steps.size == 3 && @steps[1].dumplings.size == 1
+            @steps.pop
+            @steps.pop
+            call_two 
+        elsif @steps.size == 3 && @steps[1].dumplings.size > 1
+            @steps.pop
+            call_three 
+        elsif @steps.size == 2
+            @steps.pop
+            call_two 
+        elsif @steps.size == 1
+            @steps.pop
+            call_one 
+        elsif @steps.size == 0
+            puts "\n"
+            puts "You are on the first page. Please enter another input.".colorize(:yellow) 
+            get_input_one
+        end 
+    end
+
+    def back_to_first_screen
+        if @steps.size == 0
+            puts "\n"
+            puts "You are on the first page. Please enter another input.".colorize(:yellow) 
+            get_input_one
+        else 
+            call_one
+        end
+    end
+
+    def history_screen
+        puts "\n"
+        @history.each do | paragraph | 
+            puts paragraph
+            puts "\n" 
+        end
+        puts "Enter 'done' to return.".colorize(:yellow)
+        side_screen_loop
+    end
+
+    def help_screen
+        puts "\n"
+        print TTY::Box.frame "back        Go back one screen", "back!       Go back to first screen", "exit        Quit application", "help        View options", "history     Read about the history of dumplings", "<list #>    Navigate to region, country, or dumpling"
+        puts "\n"
+        puts "Enter 'done' to return.".colorize(:yellow)
+        side_screen_loop 
+    end
+    
+    def side_screen_loop
         @input = gets.chomp
         until @input == 'done' || @input == 'exit' do
             puts "\n"
             puts "Sorry, that is not a valid input. Please try again.".colorize(:yellow) 
-            self.h_loop
+            side_screen_loop
         end
         if @input == 'done'
-            h_back
+            back_to_main_screen
         elsif @input == 'exit'
             exit
         end
     end
 
-    def help_screen
-        puts "\n"
-        print TTY::Box.frame "back        Go back one step", "back!       Go back to first step", "exit        Quit application", "help        View options", "history     Read about the history of dumplings", "<list #>    Navigate to region, country, or dumpling"
-        puts "\n"
-        puts "Enter 'done' to return.".colorize(:yellow) 
+    def back_to_main_screen
+        if @steps.size == 3
+            call_four
+        elsif @steps.size == 2
+            call_three
+        elsif @steps.size == 1
+            call_two
+        elsif @steps.size == 0
+            call_one
+        end 
     end
     
     def call_one
@@ -101,9 +175,9 @@ class DumplingApplication
         if @index >= 0 && @index < Region.all.size 
             @region = Region.all[@index]
             @steps << @region
-            self.call_two
+            call_two
         end
-        valid_input_one
+        valid_input
     end
 
     def call_two
@@ -130,7 +204,7 @@ class DumplingApplication
         elsif @region.countries_with_dumplings[@index].dumplings.size != 1 && @index >= 0 && @index < @region.countries_with_dumplings.size 
             @country = @region.countries_with_dumplings[@index]
             @steps << @country
-            self.call_three
+            call_three
         end
         valid_input
     end
@@ -153,7 +227,7 @@ class DumplingApplication
         if @index >= 0 && @index < @country.dumplings.size
             @dumpling = @country.dumplings[@index]
             @steps << @dumpling
-            self.call_four
+            call_four
         end
         valid_input
     end
@@ -177,55 +251,6 @@ class DumplingApplication
         valid_input
     end
 
-    def valid_input_one   
-        if @input == 'exit'
-            puts "Thank you for using Dumplings."
-            puts "Goodbye!"
-            exit        
-        elsif @input == 'back'
-            puts "You are on the first page. Please try again.".colorize(:yellow) 
-            puts "\n"
-            get_input_one
-        elsif @input == 'back!'
-            puts "You are on the first page. Please try again.".colorize(:yellow) 
-            puts "\n"
-            get_input_one
-        elsif @input == 'history'
-            history
-            "\n"
-        elsif @input == 'help'
-            "\n"
-            help_screen
-            h_loop
-            "\n"        
-        end     
-    end
-
-    def valid_input    
-        if @input == 'exit'
-            puts "\n"
-            puts "Thank you for using Dumplings.".colorize(:cyan)
-            puts "Goodbye!".colorize(:cyan)
-            puts "\n"
-            exit        
-        elsif @input == 'back'
-            back
-            "\n"
-        elsif @input == 'back!'
-            back_all
-            "\n"
-        elsif @input == 'history'
-            history
-            h_loop
-            "\n"
-        elsif @input == 'help'
-            help_screen
-            h_loop
-            "\n"
-        end    
-    end
-
-
     def display_regions_list
         Region.all.each_with_index{| region_instance, index | puts "#{index + 1}  #{region_instance.name}"}         
     end
@@ -242,55 +267,7 @@ class DumplingApplication
         puts @dumpling.name.colorize(:cyan)
         puts "\n"
         puts @dumpling.blurb.colorize(:cyan)
-        @steps << @dumpling.blurb
     end
 
-    def h_back
-        if @steps.size == 4
-            call_four #countries
-        elsif @steps.size == 3
-            call_four #countries
-        elsif @steps.size == 2
-            call_three #regions
-        elsif @steps.size == 1
-            call_two
-        elsif @steps.size == 0
-            call_one
-        end 
-    end
-
-    def back
-        if @steps.size == 4 && @steps[1].dumplings.size == 1
-            @steps.pop
-            @steps.pop
-            call_two #countries
-        elsif @steps.size == 4 && @steps[1].dumplings.size != 1
-            @steps.pop
-            call_three #dumplings
-        elsif @steps.size == 3
-            @steps.pop
-            call_three #countries
-        elsif @steps.size == 2
-            @steps.pop
-            call_two #regions
-        elsif @steps.size == 1
-            @steps.pop
-            call_one #regions
-        end 
-    end
-
-    def back_all
-        call_one
-    end
-
-    def history
-        puts "\n"
-        @history.each do | paragraph | 
-            puts paragraph
-            puts "\n" 
-        end
-        puts "Enter 'done' to return.".colorize(:yellow)
-        h_loop
-    end
 end
-
+    

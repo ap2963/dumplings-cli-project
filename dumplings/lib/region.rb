@@ -16,16 +16,9 @@ class Region
     def self.create_region_instances(attributes)
         attributes.each do | attr_hash |
             region_name = attr_hash[:region_name]
-        
-            #if region_name != "Unknown" && region_name != nil
-                region = Region.find_or_create_by_name(region_name)
-            # else
-            #     DumplingApplication.issues[:names] << attr_hash
-            #end
+            region = Region.find_or_create_by_name(region_name)
             if attr_hash[:region] == nil
                 attr_hash[:region] = region
-            # else 
-                # DumplingApplication.issues[:names] << region
             end
         end     
     end

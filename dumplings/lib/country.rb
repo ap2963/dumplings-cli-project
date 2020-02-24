@@ -1,6 +1,6 @@
 class Country
-    attr_accessor :name, :dumplings, :region
-    attr_reader 
+    attr_accessor :name, :region
+    attr_reader :dumplings
 
     @@all = []
         
@@ -18,15 +18,9 @@ class Country
         attributes.each do | attr_hash | 
             country_name = attr_hash[:country_name]
             region = attr_hash[:region] 
-            #if country_name != "Unknown" && country_name != nil
-                country = Country.find_or_create_by_name(country_name, region)
-            # else
-            #     DumplingApplication.issues[:names] << attr_hash
-            #end
+            country = Country.find_or_create_by_name(country_name, region)
             if attr_hash[:country] == nil
                 attr_hash[:country] = country
-            # else 
-            #     DumplingApplication.issues[:instances] << country
             end
         end
     end

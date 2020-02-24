@@ -1,6 +1,5 @@
 class Dumpling
-    attr_accessor :name, :country, :region, :blurb
-    attr_reader  
+    attr_accessor :name, :country, :region, :blurb 
 
     @@all = []
     
@@ -22,15 +21,9 @@ class Dumpling
             country = attr_hash[:country]
             region = attr_hash[:region]
             blurb = attr_hash[:blurb]
-            #if dumpling_name != "Unknown" && dumpling_name != nil
-                dumpling = Dumpling.find_or_create_by_name(dumpling_name, country, region, blurb)
-            # else
-            #     DumplingApplication.issues[:names] << attr_hash             #should be in bin or something
-            #end
+            dumpling = Dumpling.find_or_create_by_name(dumpling_name, country, region, blurb)
             if attr_hash[:dumpling] == nil
                 attr_hash[:dumpling] = dumpling
-            # else 
-            #     DumplingApplication.issues[:instances] << dumpling
             end
         end
     end
